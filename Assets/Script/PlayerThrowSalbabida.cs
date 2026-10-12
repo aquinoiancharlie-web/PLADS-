@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using TMPro; // Idinagdag para sa TextMeshPro UI
 
 [RequireComponent(typeof(LineRenderer))]
 public class PlayerThrowSalbabida : MonoBehaviour
@@ -8,6 +9,9 @@ public class PlayerThrowSalbabida : MonoBehaviour
     [SerializeField] private GameObject salbabidaPrefab;
     [SerializeField] private Transform throwPoint;
     [SerializeField] private float cooldown = 0.5f;
+
+    [Header("UI Cooldown Display")]
+    [SerializeField] private TextMeshProUGUI cooldownText; // I-drag dito ang UI Text mula sa Canvas
 
     [Header("Aim Trajectory Settings")]
     [SerializeField] private int trajectoryPoints = 25;
@@ -35,6 +39,9 @@ public class PlayerThrowSalbabida : MonoBehaviour
 
     private void Update()
     {
+        // Update sa Cooldown UI Text
+        UpdateCooldownUI();
+
         // Laging i-update ang aiming trajectory arc papunta sa mouse position
         UpdateAimTrajectory();
 
@@ -45,6 +52,23 @@ public class PlayerThrowSalbabida : MonoBehaviour
             {
                 ThrowSalbabida();
             }
+        }
+    }
+
+    private void UpdateCooldownUI()
+    {
+        if (cooldownText == null) return;
+
+        if (Time.time < nextThrowTime)
+        {
+            float remainingTime = nextThrowTime - Time.time;
+            cooldownText.text = $"Lifebuoy: {remainingTime:F1}s";
+            cooldownText.color = Color.yellow; // Kulay dilaw habang nagco-cooldown
+        }
+        else
+        {
+            cooldownText.text = "Lifebuoy: READY!";
+            cooldownText.color = Color.green; // Kulay berde kapag ready na
         }
     }
 

@@ -14,6 +14,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI alertBannerText;
     [SerializeField] private TextMeshProUGUI waterLevelText;
 
+    [Header("End Game Panels")]
+    [SerializeField] private GameObject victoryPanel;   // I-drag dito ang Victory UI Panel
+    [SerializeField] private GameObject gameOverPanel;  // (Opsyonal) I-drag dito ang Game Over UI Panel
+
     [Header("Announcement Settings")]
     [SerializeField] private float alertDuration = 5f;
 
@@ -46,6 +50,10 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
+        // Siguraduhing nakatago muna ang Victory at Game Over panels sa simula
+        if (victoryPanel != null) victoryPanel.SetActive(false);
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+
         UpdateRescueUI();
         UpdateHullUI(100f);
         ShowAlert("NDRRMC ALERT: Flood levels rising. Locate and rescue stranded survivors!", alertDuration);
@@ -75,6 +83,7 @@ public class UIManager : MonoBehaviour
                 missionTimeSeconds = 0f;
                 isTimerRunning = false;
                 ShowAlert("TIME EXPIRED: Flood waters have breached safety levels!", 0f);
+                TriggerGameOver();
             }
 
             DisplayTime(missionTimeSeconds);
@@ -113,6 +122,7 @@ public class UIManager : MonoBehaviour
             }
 
             ShowAlert("MISSION SUCCESS: All survivors rescued safely!", 0f);
+            TriggerVictory();
         }
         else
         {
@@ -179,15 +189,46 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    // VICTORY CONDITION TRIGGER
+    private void TriggerVictory()
+    {
+        if (victoryPanel != null)
+        {
+            victoryPanel.SetActive(true);
+        }
+
+        UnlockCursorAndPause();
+    }
+
+    // GAME OVER CONDITION TRIGGER
+    private void TriggerGameOver()
+    {
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
+
+        UnlockCursorAndPause();
+    }
+
+    private void UnlockCursorAndPause()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        Time.timeScale = 0f; // I-pause ang laro
+    }
+
     // PUBLIC FUNCTION: Para sa Main Menu Button
     public void GoToMainMenu()
     {
+        Time.timeScale = 1f; // Ibalik muna ang oras sa normal
         SceneManager.LoadScene("MainMenu");
     }
 
     // PUBLIC FUNCTION: Para sa Retry / Play Again Button
     public void RestartMission()
     {
+        Time.timeScale = 1f; // Ibalik muna ang oras sa normal
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
